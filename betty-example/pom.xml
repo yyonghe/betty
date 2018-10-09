@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+    <groupId>io.betty</groupId>
+    <artifactId>betty-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+  
+  <artifactId>betty-example</artifactId>
+  <name>betty-example</name>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <kilim.weave.required>true</kilim.weave.required>
+	<kilim.includes>.</kilim.includes>
+  </properties>
+  
+  <dependencies>
+  
+  	<dependency>
+  		<groupId>${project.groupId}</groupId>
+  		<artifactId>betty-server</artifactId>
+  		<version>${project.version}</version>
+  	</dependency>
+  	
+  	<dependency>
+  		<groupId>${project.groupId}</groupId>
+  		<artifactId>betty-kilim</artifactId>
+  		<version>${project.version}</version>
+  	</dependency>
+  	
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+      <scope>test</scope>
+    </dependency>
+    
+  </dependencies>
+  
+</project>

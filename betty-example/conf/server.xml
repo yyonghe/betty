@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Server name="Server" cmd="0x35B">
+
+  <Listener className="io.betty.example.SimpleLifecycleListener" />
+
+<!--   <Executor name="kilim" workerThreadsNum="16" taskNum="10000" /> -->
+<!--   <Executor name="io.betty.server.DefaultKilimExecutor" workerThreadsNum="16" taskNum="50000" /> -->
+  
+  <Connectors>
+	  <Connector kind="udp" port="8009" protocol="string" options="CONNECT_TIMEOUT_MILLIS =200,WRITE_SPIN_COUNT =200,SO_SNDBUF =200,SO_RCVBUF =200,SO_LINGER =200,SO_BACKLOG =200,SO_TIMEOUT =200,IP_TOS =200,IP_MULTICAST_TTL =200,IP_MULTICAST_LOOP_DISABLED=true,TCP_NODELAY=true,SINGLE_EVENTEXECUTOR_PER_GROUP=true,ALLOW_HALF_CLOSURE=true,AUTO_READ=true,AUTO_CLOSE=true,SO_BROADCAST=true,SO_KEEPALIVE=true,SO_REUSEADDR=true,SO_REUSEPORT= true,IP_FREEBIND= true,IP_TRANSPARENT= true,IP_RECVORIGDSTADDR= true,TCP_CORK= true,TCP_FASTOPEN_CONNECT= true,TCP_QUICKACK= true,TCP_KEEPIDLE= 200,TCP_KEEPINTVL= 200,TCP_KEEPCNT= 200,TCP_USER_TIMEOUT= 200,TCP_FASTOPEN= 200,TCP_DEFER_ACCEPT= 200,TCP_NOTSENT_LOWAT=2000"/>
+	  <Connector kind="tcp" port="8080" protocol="string"/>
+	  <Connector kind="udp" port="8087" protocol="string"/>
+	  <Connector kind="tcp" eth="eth0" port="8009" protocol="string" protocolCoder="" nWorkerThreads="8" options="CONNECT_TIMEOUT_MILLIS =200,WRITE_SPIN_COUNT =200,SO_SNDBUF =200,SO_RCVBUF =200,SO_LINGER =200,SO_BACKLOG =200,SO_TIMEOUT =200,IP_TOS =200,IP_MULTICAST_TTL =200,IP_MULTICAST_LOOP_DISABLED=true,TCP_NODELAY=true,SINGLE_EVENTEXECUTOR_PER_GROUP=true,ALLOW_HALF_CLOSURE=true,AUTO_READ=true,AUTO_CLOSE=true,SO_BROADCAST=true,SO_KEEPALIVE=true,SO_REUSEADDR=true,SO_REUSEPORT= true,IP_FREEBIND= true,IP_TRANSPARENT= true,IP_RECVORIGDSTADDR= true,TCP_CORK= true,TCP_FASTOPEN_CONNECT= true,TCP_QUICKACK= true,TCP_KEEPIDLE= 200,TCP_KEEPINTVL= 200,TCP_KEEPCNT= 200,TCP_USER_TIMEOUT= 200,TCP_FASTOPEN= 200,TCP_DEFER_ACCEPT= 200,TCP_NOTSENT_LOWAT=2000" tryEpoll="true"/>
+  </Connectors>
+  
+  <Properties>
+	<Property type="kv" key="abc" value="123" />
+	<Property type="file" filePath="../conf/jungle.properties" />
+  </Properties>
+  
+  <Services serviceClass="io.betty.example.SimpleStringService">
+    
+	<Service name="Service" subcmd="231" servicelet="io.betty.example.servicelets.SimpleEchoServicelet"/>
+	
+  </Services>
+</Server>

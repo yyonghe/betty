@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>io.betty</groupId>
+	<artifactId>betty-parent</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<name>betty</name>
+
+	<modules>
+		<module>betty-common</module>
+		<module>betty-server</module>
+		<module>betty-report</module>
+		<module>betty-example</module>
+		<module>betty-kilim</module>
+  </modules>
+
+	<properties>
+		<maven.compiler.source>1.8</maven.compiler.source>
+    	<maven.compiler.target>1.8</maven.compiler.target>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<skipTests>true</skipTests>
+<!-- 		<maven.test.skip>true</maven.test.skip> -->
+		<project.build.os/>
+		<!-- native support -->
+		<native.compile.required>false</native.compile.required>
+		<!-- kilim support -->
+		<kilim.weave.required>false</kilim.weave.required>
+		<kilim.includes>.</kilim.includes>
+		<kilim.excludes>ConnectorCreateRule</kilim.excludes>
+		
+		<tools.build.app>true</tools.build.app>
+		<!-- application args -->
+		<java.jvm.command.args>-Xms512m -Xmx2048m</java.jvm.command.args>
+		<java.app.command.args/>
+		
+		<!-- ant dependencies version -->
+		<ant.version>1.9.9</ant.version>
+		<ant.launcher.version>1.9.9</ant.launcher.version>
+		<ant.contrib.version>1.0b3</ant.contrib.version>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<!-- https://mvnrepository.com/artifact/commons-digester/commons-digester -->
+			<dependency>
+				<groupId>commons-digester</groupId>
+				<artifactId>commons-digester</artifactId>
+				<version>2.1</version>
+			</dependency>
+			
+			<dependency>
+			  <groupId>com.google.inject</groupId>
+			  <artifactId>guice</artifactId>
+			  <version>4.2.0</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.google.protobuf</groupId>
+				<artifactId>protobuf-java</artifactId>
+				<version>2.6.1</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.lmax</groupId>
+				<artifactId>disruptor</artifactId>
+				<version>3.4.2</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<version>2.11.1</version>
+				<artifactId>log4j-core</artifactId>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-slf4j-impl</artifactId>
+				<version>2.11.1</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.netty</groupId>
+				<artifactId>netty-all</artifactId>
+				<version>4.1.29.Final</version>
+			</dependency>
+
+<!-- 			<dependency> -->
+<!-- 				<groupId>kilim</groupId> -->
+<!-- 				<artifactId>kilim</artifactId> -->
+<!-- 				<version>1.0.7</version> -->
+<!-- 			</dependency> -->
+			<dependency>
+				<groupId>org.db4j</groupId>
+				<artifactId>kilim</artifactId>
+				<version>2.0.0-26</version>
+<!-- 				<version>1.0.7</version> -->
+			</dependency>
+			
+			<dependency>
+			    <groupId>org.apache.ant</groupId>
+			    <artifactId>ant</artifactId>
+			    <version>${ant.version}</version>
+			</dependency>
+		
+		
+		</dependencies>
+
+	</dependencyManagement>
+
+
+	<build>
+		<directory>${project.basedir}/target${project.build.os}</directory>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-release-plugin</artifactId>
+					<version>2.0</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-antrun-plugin</artifactId>
+					<version>1.8</version>
+					<dependencies>
+						<dependency>
+							<groupId>org.apache.ant</groupId>
+							<artifactId>ant</artifactId>
+							<version>${ant.version}</version>
+						</dependency>
+						<dependency>
+							<groupId>org.apache.ant</groupId>
+							<artifactId>ant-launcher</artifactId>
+							<version>${ant.launcher.version}</version>
+						</dependency>
+						<dependency>
+							<groupId>ant-contrib</groupId>
+							<artifactId>ant-contrib</artifactId>
+							<version>${ant.contrib.version}</version>
+						</dependency>
+					</dependencies>
+					<executions>
+						<execution>
+							<id>kilim-weave</id>
+							<phase>prepare-package</phase>
+							<configuration>
+								<!-- if kilim weaving is enabled -->
+								<target if="${kilim.weave.required}">
+									<java classname="kilim.tools.Weaver" fork="yes" failonerror="true">
+										<classpath refid="maven.compile.classpath"/>
+										<arg value="-d"/>
+										<arg value="${project.build.outputDirectory}"/>
+										<arg value="-x"/>
+										<arg value="${kilim.excludes}"/>
+										<arg line="${kilim.includes}" prefix="${project.build.outputDirectory}/"/>
+									</java>
+								</target>
+							</configuration>
+							<goals>
+								<goal>run</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>kilim-weave-jar</id>
+							<phase>prepare-package</phase>
+							<configuration>
+								<!-- if kilim weaving is enabled -->
+								<target if="${kilim.weave.required}">
+									<taskdef resource="net/sf/antcontrib/antlib.xml"/>
+									<propertyselector property="betty.framework.jarfiles" match="^(io.betty:[^:]+:jar(?::[^:]+)?)$" select="\1"/>
+									<for list="${betty.framework.jarfiles}" param="betty.framework.jarfile">
+										<sequential>
+											<basename property="@{betty.framework.jarfile}_filename" file="${@{betty.framework.jarfile}}"/>
+											<unzip src="${@{betty.framework.jarfile}}" dest="${project.build.directory}/${@{betty.framework.jarfile}_filename}.dir"/>
+											<java classname="kilim.tools.Weaver" fork="yes" failonerror="true">
+												<classpath refid="maven.compile.classpath"/>
+												<arg value="-d"/>
+												<arg value="${project.build.directory}/${@{betty.framework.jarfile}_filename}.dir"/>
+												<arg value="-x"/>
+												<arg value="${kilim.excludes}"/>
+												<arg line="." prefix="${project.build.directory}/${@{betty.framework.jarfile}_filename}.dir/"/>
+											</java>
+											<jar jarfile="${project.build.directory}/${@{betty.framework.jarfile}_filename}" basedir="${project.build.directory}/${@{betty.framework.jarfile}_filename}.dir"/>
+										</sequential>
+									</for>
+								</target>
+							</configuration>
+							<goals>
+								<goal>run</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>build-app-dir</id>
+							<phase>package</phase>
+							<goals>
+								<goal>run</goal>
+							</goals>
+							<configuration>
+								<target if="${tools.build.app}">
+									<taskdef resource="net/sf/antcontrib/antlib.xml"/>
+									<condition property="build.package.avilable">
+										<and>
+											<contains string="${os.name}" substring="Linux"/>
+											<not>
+											<equals arg1="${project.artifactId}" arg2="betty-parent"/>
+											</not>
+										</and>
+									</condition>
+									<if>
+										<equals arg1="true" arg2="${build.package.avilable}"/>
+										<then>
+											<taskdef name="BettyCopyTask" classname="io.betty.ant.tools.BettyCopyTask" classpath="${project.build.directory}/classes:${io.betty:betty-common:jar}:${org.apache.ant:ant:jar}"/>
+											<property name="ref.maven.compile.classpath" refid="maven.compile.classpath"/>
+											<property name="app.dir" value="${project.basedir}"/>
+											<mkdir dir="${app.dir}"/>
+											<mkdir dir="${app.dir}/bin"/>
+											<mkdir dir="${app.dir}/lib"/>
+											<mkdir dir="${app.dir}/conf"/>
+											<mkdir dir="${app.dir}/logs"/>
+											<mkdir dir="${app.dir}/tmp"/>
+											<for list="${ref.maven.compile.classpath}" delimiter=":" param="jarpath">
+												<sequential>
+													<if>
+														<contains string="@{jarpath}" substring=".jar"/>
+														<then>
+															<basename property="@{jarpath}_filename" file="@{jarpath}"/>
+															<available property="exist.weave.@{jarpath}" file="${@{jarpath}_filename}" filepath="${project.build.directory}"/>
+															<if>
+																<equals arg1="${exist.weave.@{jarpath}}" arg2="true"/>
+																<then>
+																	<BettyCopyTask file="${project.build.directory}/${@{jarpath}_filename}" todir="${app.dir}/lib"/>
+																</then>
+																<else>
+																	<BettyCopyTask file="@{jarpath}" todir="${app.dir}/lib"/>
+																</else>
+															</if>
+														</then>
+													</if>
+												</sequential>
+											</for>
+											<BettyCopyTask file="${project.build.directory}/${project.artifactId}-${project.version}.jar" todir="${app.dir}/lib"/>
+										</then>
+									</if>
+								</target>
+							</configuration>
+						</execution>
+						<execution>
+							<id>build-app-scripts</id>
+							<phase>package</phase>
+							<goals>
+								<goal>run</goal>
+							</goals>
+							<configuration>
+								<target if="${tools.build.app}">
+									<taskdef resource="net/sf/antcontrib/antlib.xml"/>
+									<condition property="build.package.avilable">
+										<and>
+											<contains string="${os.name}" substring="Linux"/>
+											<not>
+											<equals arg1="${project.artifactId}" arg2="betty-parent"/>
+											</not>
+										</and>
+									</condition>
+									<if>
+										<equals arg1="true" arg2="${build.package.avilable}"/>
+										<then>
+											<property name="app.dir" value="${project.basedir}"/>
+											<taskdef name="BettyScriptWriterTask" classname="io.betty.ant.tools.BettyScriptExportTask" classpath="${project.build.directory}/classes:${io.betty:betty-common:jar}"/>
+											<BettyScriptWriterTask bindir="${app.dir}/bin"/>
+											<!-- build script -->
+											<property name="start.sh" value="${app.dir}/bin/start.sh"/>
+											<echo file="${start.sh}" append="false" message="#!/bin/sh${line.separator}"/>
+											<echo file="${start.sh}" append="true" message="_BETTY_SCRIPT_BIN_DIR=$$(cd $$(dirname $$0);pwd)${line.separator}"/>
+											<echo file="${start.sh}" append="true" message="_BETTY_SCRIPT_JVM_ARGS=&quot;${java.jvm.command.args}&quot;${line.separator}"/>
+											<echo file="${start.sh}" append="true" message="_BETTY_SCRIPT_APP_ARGS=&quot;${java.app.command.args}&quot;${line.separator}"/>
+											<echo file="${start.sh}" append="true" message=". $${_BETTY_SCRIPT_BIN_DIR}/betty.sh${line.separator}"/>
+											<echo file="${start.sh}" append="true" message="betty_main "/>
+											<echo file="${start.sh}" append="true" message="$${_BETTY_SCRIPT_BIN_DIR} "/>
+											<echo file="${start.sh}" append="true" message="start "/>
+											<echo file="${start.sh}" append="true" message="${project.artifactId} "/>
+											<echo file="${start.sh}" append="true" message="${project.version} "/>
+											<echo file="${start.sh}" append="true" message="${line.separator}"/>
+											<echo file="${start.sh}" append="true" message="${line.separator}"/>
+											<property name="kill.sh" value="${app.dir}/bin/kill.sh"/>
+											<echo file="${kill.sh}" append="false" message="#!/bin/sh${line.separator}"/>
+											<echo file="${kill.sh}" append="true" message="_BETTY_SCRIPT_BIN_DIR=$$(dirname $$0)${line.separator}"/>
+											<echo file="${kill.sh}" append="true" message="_BETTY_SCRIPT_BIN_DIR=$$(cd $$(dirname $$0);pwd)${line.separator}"/>
+											<echo file="${kill.sh}" append="true" message=". ${_BETTY_SCRIPT_BIN_DIR}/betty.sh${line.separator}"/>
+											<echo file="${kill.sh}" append="true" message="betty_main "/>
+											<echo file="${kill.sh}" append="true" message="$${_BETTY_SCRIPT_BIN_DIR} "/>
+											<echo file="${kill.sh}" append="true" message="kill "/>
+											<echo file="${kill.sh}" append="true" message="${project.artifactId} "/>
+											<echo file="${kill.sh}" append="true" message="${line.separator}"/>
+											<echo file="${kill.sh}" append="true" message="${line.separator}"/>
+											<property name="run.sh" value="${app.dir}/bin/run.sh"/>
+											<echo file="${run.sh}" append="false" message="#!/bin/sh${line.separator}"/>
+											<echo file="${run.sh}" append="true" message="_BETTY_SCRIPT_BIN_DIR=$$(cd $$(dirname $$0);pwd)${line.separator}"/>
+											<echo file="${run.sh}" append="true" message="_BETTY_SCRIPT_JVM_ARGS=&quot;${java.jvm.command.args}&quot;${line.separator}"/>
+											<echo file="${run.sh}" append="true" message="_BETTY_SCRIPT_APP_ARGS=&quot;${java.app.command.args}&quot;${line.separator}"/>
+											<echo file="${run.sh}" append="true" message=". $${_BETTY_SCRIPT_BIN_DIR}/betty.sh${line.separator}"/>
+											<echo file="${run.sh}" append="true" message="betty_main "/>
+											<echo file="${run.sh}" append="true" message="$${_BETTY_SCRIPT_BIN_DIR} "/>
+											<echo file="${run.sh}" append="true" message="run "/>
+											<echo file="${run.sh}" append="true" message="${project.artifactId} "/>
+											<echo file="${run.sh}" append="true" message="${project.version} "/>
+											<echo file="${run.sh}" append="true" message="${line.separator}"/>
+											<echo file="${run.sh}" append="true" message="${line.separator}"/>
+										</then>
+									</if>
+								</target>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>3.1.0</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.22.0</version>
+					<configuration>
+						<skipTests>${skipTests}</skipTests>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+
+		<plugins>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>
