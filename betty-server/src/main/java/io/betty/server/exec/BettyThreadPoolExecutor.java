@@ -18,6 +18,7 @@ import io.betty.lifecycle.LifecycleBase;
 import io.betty.lifecycle.LifecycleException;
 import io.betty.util.InternalSlf4JLoggerFactory;
 import io.netty.channel.ChannelHandlerContext;
+import kilim.NotPausable;
 
 public class BettyThreadPoolExecutor extends LifecycleBase implements Lifecycle, BettyExecutor {
 	
@@ -123,7 +124,7 @@ public class BettyThreadPoolExecutor extends LifecycleBase implements Lifecycle,
 		}
 		
 		@Override
-		public void run() {
+		public void run() throws NotPausable {
 			try {
 				bctx.startContext(ctx);
 			} catch (Exception e) {

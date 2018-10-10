@@ -69,7 +69,6 @@ public class BettyKilimExecutor extends LifecycleBase implements Lifecycle, Bett
 	
 	@Override
 	protected void initInternal() throws LifecycleException {
-		
 		//
 		this.taskNum = MiscUtils.ceilingNextPowerOfTwo(taskNum);
 		this.taskNumMask = this.taskNum - 1;

@@ -23,6 +23,7 @@ import io.betty.server.digester.DigesterFactory;
 import io.betty.server.exec.BettyThreadPoolExecutor;
 import io.betty.util.BettyLog4jInitializer;
 import io.betty.util.InternalSlf4JLoggerFactory;
+import kilim.KilimTools;
 
 public class BettyServerBootStrap {
 	
@@ -107,8 +108,18 @@ public class BettyServerBootStrap {
 			try {
 				executor = injector.getInstance(BettyExecutor.class);
 			} catch (Exception e) {
-				logger.info("No betty executor found, use default executor: {}.", BettyThreadPoolExecutor.class.getName());
+				if(KilimTools.isKilimMode()) {
+					// try use kilim executor.
+					try {
+						String defaultKilimClassName = "io.betty.kilim.BettyKilimExecutor";
+						executor = (BettyExecutor) injector.getInstance(Class.forName(defaultKilimClassName));
+						logger.info("No betty executor found, use default executor: {}.", defaultKilimClassName);
+					} catch (Exception e1) {
+						logger.error("Server is running as kilim mode, but no kilim executor can use", e1);
+					}
+				}
 				executor = injector.getInstance(BettyThreadPoolExecutor.class);
+				logger.info("No betty executor found, use default executor: {}.", BettyThreadPoolExecutor.class.getName());
 			}
 			
 			server.setExecutor(executor);
