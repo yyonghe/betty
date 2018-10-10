@@ -2,6 +2,9 @@ package io.betty.example;
 
 import org.slf4j.Logger;
 
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+
 import co.paralleluniverse.fibers.SuspendExecution;
 import io.betty.lifecycle.Lifecycle;
 import io.betty.server.BettyServerContext;
@@ -18,6 +21,11 @@ import kilim.Pausable;
 public class SimpleStringService extends AbstractService implements BettyService, Lifecycle {
 	
 	private static final Logger logger = InternalSlf4JLoggerFactory.getLogger(SimpleStringService.class);
+	
+	@Inject
+	public SimpleStringService(Injector injector) {
+		super(injector);
+	}
 	
 	@Override
 	public void doService(ChannelHandlerContext ctx, BettyServerContext bctx) throws Pausable, SuspendExecution, Exception {

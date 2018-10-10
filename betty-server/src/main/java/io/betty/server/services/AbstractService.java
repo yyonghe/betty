@@ -5,6 +5,8 @@ import java.util.Date;
 
 import org.slf4j.Logger;
 
+import com.google.inject.Injector;
+
 import co.paralleluniverse.fibers.SuspendExecution;
 import io.betty.lifecycle.Lifecycle;
 import io.betty.lifecycle.LifecycleBase;
@@ -26,7 +28,7 @@ public abstract class AbstractService extends LifecycleBase implements BettyServ
 	
 	private static final Logger logger = InternalSlf4JLoggerFactory.getLogger(AbstractService.class);
 	
-	ThreadLocal<SimpleDateFormat> sdfLocal = new ThreadLocal<SimpleDateFormat>() {
+	protected ThreadLocal<SimpleDateFormat> sdfLocal = new ThreadLocal<SimpleDateFormat>() {
 		
 		protected SimpleDateFormat initialValue() {
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -44,6 +46,12 @@ public abstract class AbstractService extends LifecycleBase implements BettyServ
 	private BettyServer server;
 	
 	protected BettyServicelet servicelet;
+	
+	private Injector injector;
+	
+	public AbstractService(Injector injector) {
+		this.injector = injector;
+	}
 	
 	@Override
 	public void service(ChannelHandlerContext ctx, BettyServerContext bctx) throws Pausable, SuspendExecution, Exception {
@@ -108,13 +116,11 @@ public abstract class AbstractService extends LifecycleBase implements BettyServ
 
 	@Override
 	protected void startInternal() throws LifecycleException {
-		setState(LifecycleState.STARTING);
 		
 	}
 
 	@Override
 	protected void stopInternal() throws LifecycleException {
-		setState(LifecycleState.STOPPING);
 		
 	}
 
@@ -173,7 +179,8 @@ public abstract class AbstractService extends LifecycleBase implements BettyServ
 	 */
 	public void setServicelet(String servicelet) {
 		try {
-			this.servicelet = (BettyServicelet) Class.forName(servicelet).newInstance();
+			//this.servicelet = (BettyServicelet) Class.forName(servicelet).newInstance();
+			this.servicelet = (BettyServicelet) injector.getInstance(Class.forName(servicelet));
 		} catch (Exception e) {
 			throw new IllegalArgumentException("Create service let failed for " + servicelet, e);
 		}

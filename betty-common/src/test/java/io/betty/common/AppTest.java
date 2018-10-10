@@ -1,5 +1,6 @@
 package io.betty.common;
 
+import io.betty.ant.tools.BettyScriptExportTask;
 import io.betty.util.MiscUtils;
 
 /**
@@ -23,5 +24,13 @@ public class AppTest {
 		System.out.println(-1 & mask);
 		System.out.println(Integer.MIN_VALUE & mask);
 		System.out.println(Integer.MAX_VALUE & mask);
+	}
+	
+	@org.junit.Test
+	public void testPropertyToken() {
+		BettyScriptExportTask task = new BettyScriptExportTask();
+		
+		
+		System.out.println(task.getTokens("_appname=${betty:app.appname}"));
 	}
 }

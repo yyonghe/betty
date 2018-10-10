@@ -72,8 +72,8 @@ public class DefaultClientContext implements BettyClientContext {
 	}
 	
 	@Override
-	public void run(ChannelHandlerContext ctx) throws Pausable, SuspendExecution, Exception {
-		
+	public void startContext(ChannelHandlerContext ctx) throws Pausable, SuspendExecution, Exception {
+		// 
 	}
 
 	@Override

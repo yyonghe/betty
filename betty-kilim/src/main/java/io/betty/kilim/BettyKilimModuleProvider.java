@@ -18,8 +18,8 @@ public class BettyKilimModuleProvider implements BettyModuleProvider {
 		@Override
 		protected void configure() {
 			
-			bind(BettyResultWaitStrategy.class).to(KilimResultWaitStrategy.class);
-			bind(BettyExecutor.class).to(KilimExecutor.class);
+			bind(BettyResultWaitStrategy.class).to(BettyKilimExecutorResultWaitStrategy.class);
+//			bind(BettyExecutor.class).to(BettyKilimExecutor.class);
 			
 		}
 		

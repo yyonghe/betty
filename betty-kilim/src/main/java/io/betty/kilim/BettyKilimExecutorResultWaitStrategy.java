@@ -6,8 +6,8 @@ import io.betty.BettyResultWaitStrategy;
 import kilim.Mailbox;
 import kilim.Pausable;
 
-public class KilimResultWaitStrategy implements BettyResultWaitStrategy {
-
+public class BettyKilimExecutorResultWaitStrategy implements BettyResultWaitStrategy {
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T waitFor(Object waiter, long waitTime) throws Pausable, SuspendExecution, Exception {

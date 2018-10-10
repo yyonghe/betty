@@ -181,9 +181,18 @@ public class DefaultClient implements BettyClient {
 	@Override
 	public <T> T waitFor(BettyClientContext reqctx) throws Pausable, SuspendExecution, Exception {
 		
-		T data = resultWaitStrategy.waitFor(reqctx.getResultWaiter(), reqctx.getWaitTime());
-		if(data == null) {
-			TimeoutException cause = new TimeoutException("Timeout on wait result.");
+		T data = null;
+		Exception exception = null;
+		try {
+			data = resultWaitStrategy.waitFor(reqctx.getResultWaiter(), reqctx.getWaitTime());
+		} catch (Exception e) {
+			exception = e;
+		}
+		if(data == null || exception != null) {
+			Exception cause = exception;
+			if(exception == null) {
+				cause = new TimeoutException("Timeout on wait result.");
+			}
 			simplefailed(reqctx, cause);
 			throw cause;
 		}

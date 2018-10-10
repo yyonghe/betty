@@ -14,7 +14,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <kilim.weave.required>true</kilim.weave.required>
+    <kilim.weave.required>false</kilim.weave.required>
 	<kilim.includes>.</kilim.includes>
   </properties>
   

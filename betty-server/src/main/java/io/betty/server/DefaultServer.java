@@ -157,8 +157,6 @@ public class DefaultServer extends LifecycleBase implements BettyServer, Lifecyc
 
 	@Override
 	protected void startInternal() throws LifecycleException {
-		fireLifecycleEvent(LifecycleState.CONFIGURE_START_EVENT, null);
-        setState(LifecycleState.STARTING);
         //
         disruptor.handleEventsWith(findLifecycleListeners());
         disruptor.start();
@@ -182,8 +180,6 @@ public class DefaultServer extends LifecycleBase implements BettyServer, Lifecyc
 
 	@Override
 	protected void stopInternal() throws LifecycleException {
-		
-		setState(LifecycleState.STOPPING);
 		//
 		disruptor.stop();
         // Init our defined Services

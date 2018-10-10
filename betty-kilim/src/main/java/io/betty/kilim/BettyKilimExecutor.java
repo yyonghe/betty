@@ -12,7 +12,6 @@ import io.betty.BettyResultWaitStrategy;
 import io.betty.lifecycle.Lifecycle;
 import io.betty.lifecycle.LifecycleBase;
 import io.betty.lifecycle.LifecycleException;
-import io.betty.lifecycle.LifecycleState;
 import io.betty.util.InternalSlf4JLoggerFactory;
 import io.betty.util.MiscUtils;
 import io.netty.channel.ChannelHandlerContext;
@@ -20,9 +19,9 @@ import kilim.Mailbox;
 import kilim.Pausable;
 import kilim.Task;
 
-public class KilimExecutor extends LifecycleBase implements Lifecycle, BettyExecutor {
+public class BettyKilimExecutor extends LifecycleBase implements Lifecycle, BettyExecutor {
 	
-	private static final Logger logger = InternalSlf4JLoggerFactory.getLogger(KilimExecutor.class);
+	private static final Logger logger = InternalSlf4JLoggerFactory.getLogger(BettyKilimExecutor.class);
 	
 	private final AtomicInteger sequence = new AtomicInteger(0);
 	
@@ -41,8 +40,8 @@ public class KilimExecutor extends LifecycleBase implements Lifecycle, BettyExec
 	private BettyResultWaitStrategy resultWaitStrategy;
 	
 	@Inject
-	public KilimExecutor(BettyResultWaitStrategy resultWaitStrategy) {
-		this.resultWaitStrategy = resultWaitStrategy;
+	public BettyKilimExecutor() {
+		this.resultWaitStrategy = new BettyKilimExecutorResultWaitStrategy();
 	}
 	
 	@Override
@@ -94,7 +93,6 @@ public class KilimExecutor extends LifecycleBase implements Lifecycle, BettyExec
 
 	@Override
 	protected void startInternal() throws LifecycleException {
-		setState(LifecycleState.STARTING);
 		//
 		for (int i = 0; i < taskNum; i++) {
 			tasks[i].start();
@@ -107,7 +105,6 @@ public class KilimExecutor extends LifecycleBase implements Lifecycle, BettyExec
 
 	@Override
 	protected void stopInternal() throws LifecycleException {
-		setState(LifecycleState.STOPPING);
 
 	}
 
@@ -171,7 +168,7 @@ public class KilimExecutor extends LifecycleBase implements Lifecycle, BettyExec
 
 	@Override
 	public String getName() {
-		return "Executor:" + this.getClass().getName();
+		return this.getClass().getCanonicalName();
 	}
 	
 	static class TaskContext {
@@ -203,7 +200,7 @@ public class KilimExecutor extends LifecycleBase implements Lifecycle, BettyExec
 						
 						BettyContext bctx = ctx.bctx;
 
-						bctx.run(ctx.ctx);
+						bctx.startContext(ctx.ctx);
 					}
 				} catch (Exception e) {
 					logger.error("Unknown exception", e);

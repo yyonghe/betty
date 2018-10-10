@@ -7,7 +7,7 @@ import io.betty.BettyClientContext;
 import io.betty.client.DefaultClient;
 import io.betty.coders.StringProtocolCoder;
 import io.betty.coders.StringProtocolPacket;
-import io.betty.kilim.KilimResultWaitStrategy;
+import io.betty.server.exec.BettyThreadPoolResultWaitStrategy;
 import junit.framework.TestCase;
 
 public class TestTcpClient extends TestCase {
@@ -17,7 +17,7 @@ public class TestTcpClient extends TestCase {
 	public void testRun() throws Exception {
 		
 		BettyClient client = new DefaultClient(new String[]{"192.168.215.129"}, 
-				new int[] {8080}, new KilimResultWaitStrategy(), new StringProtocolCoder());
+				new int[] {8080}, new BettyThreadPoolResultWaitStrategy(), new StringProtocolCoder());
 		
 		
 		StringProtocolPacket req = new StringProtocolPacket(new Random().nextInt(2100000000),

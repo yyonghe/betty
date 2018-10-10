@@ -136,14 +136,12 @@ public class ServiceAsyncEventLoop extends LifecycleBase implements Lifecycle, E
 
 	@Override
 	protected void startInternal() throws LifecycleException {
-		setState(LifecycleState.STARTING);
 		//
 		disruptor.start();
 	}
 
 	@Override
 	protected void stopInternal() throws LifecycleException {
-		setState(LifecycleState.STOPPING);
 
 	}
 

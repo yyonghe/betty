@@ -176,6 +176,7 @@ public abstract class LifecycleBase implements Lifecycle {
 
         try {
             setStateInternal(LifecycleState.STARTING_PREP, null, false);
+            setState(LifecycleState.STARTING);
             startInternal();
             if (state.equals(LifecycleState.FAILED)) {
                 // This is a 'controlled' failure. The component put itself into the
@@ -250,6 +251,8 @@ public abstract class LifecycleBase implements Lifecycle {
                 setStateInternal(LifecycleState.STOPPING_PREP, null, false);
             }
 
+            setState(LifecycleState.STOPPING);
+            
             stopInternal();
 
             // Shouldn't be necessary but acts as a check that sub-classes are

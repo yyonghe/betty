@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import io.betty.BettyProtocolCoder;
 import io.betty.lifecycle.LifecycleBase;
 import io.betty.lifecycle.LifecycleException;
-import io.betty.lifecycle.LifecycleState;
 import io.betty.server.BettyConnector;
 import io.betty.server.BettyServer;
 import io.betty.util.InternalSlf4JLoggerFactory;
@@ -101,7 +100,6 @@ public abstract class DefaultConnector extends LifecycleBase implements BettyCon
 
 	@Override
 	protected void startInternal() throws LifecycleException {
-		setState(LifecycleState.STARTING);
 		//
 		try {
 			bootstrap.bind(host, port).sync();
@@ -113,7 +111,6 @@ public abstract class DefaultConnector extends LifecycleBase implements BettyCon
 
 	@Override
 	protected void stopInternal() throws LifecycleException {
-		setState(LifecycleState.STOPPING);
 		
 	}
 

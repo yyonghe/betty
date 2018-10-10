@@ -192,7 +192,7 @@ public class DefaultServerContext implements BettyServerContext {
 	}
 	
 	@Override
-	public void run(ChannelHandlerContext ctx) throws Pausable, SuspendExecution, Exception {
+	public void startContext(ChannelHandlerContext ctx) throws Pausable, SuspendExecution, Exception {
 		service.service(ctx, this);
 	}
 

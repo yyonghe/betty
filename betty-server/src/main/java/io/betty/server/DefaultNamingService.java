@@ -3,7 +3,6 @@ package io.betty.server;
 import io.betty.lifecycle.Lifecycle;
 import io.betty.lifecycle.LifecycleBase;
 import io.betty.lifecycle.LifecycleException;
-import io.betty.lifecycle.LifecycleState;
 
 public class DefaultNamingService extends LifecycleBase implements Lifecycle {
 
@@ -117,13 +116,11 @@ public class DefaultNamingService extends LifecycleBase implements Lifecycle {
 
 	@Override
 	protected void startInternal() throws LifecycleException {
-		setState(LifecycleState.STARTING);
 		
 	}
 
 	@Override
 	protected void stopInternal() throws LifecycleException {
-		setState(LifecycleState.STOPPING);
 		
 	}
 

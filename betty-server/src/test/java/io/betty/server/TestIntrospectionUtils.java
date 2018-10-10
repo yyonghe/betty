@@ -30,7 +30,7 @@ public class TestIntrospectionUtils extends TestCase {
 	public void testFFLogAppender() throws Exception {
 		LifecycleListener listener = new BettyServerFlowLogListenerProvder().get();
 		
-		AbstractService service = new DefaultProtocolBufferService();
+		AbstractService service = new DefaultProtocolBufferService(null);
 		DefaultServerContext bctx = new DefaultServerContext(31231, "0", "0", "1111111");
 		
 		bctx.setService(service);

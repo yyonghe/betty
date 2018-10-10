@@ -2,12 +2,16 @@ package io.betty;
 
 import java.net.SocketAddress;
 
+import co.paralleluniverse.fibers.SuspendExecution;
+import io.netty.channel.ChannelHandlerContext;
+import kilim.Pausable;
+
 
 /**
  * Context for current request. 
  *
  */
-public interface BettyContext extends BettyExecutable {
+public interface BettyContext {
 	
 	/**
 	 * request sequence number
@@ -50,4 +54,6 @@ public interface BettyContext extends BettyExecutable {
 	
 	public void setProtocolCoder(BettyProtocolCoder protocolCoder);
 	public BettyProtocolCoder getProtocolCoder();
+	
+	public void startContext(ChannelHandlerContext ctx) throws Pausable, SuspendExecution, Exception;
 }

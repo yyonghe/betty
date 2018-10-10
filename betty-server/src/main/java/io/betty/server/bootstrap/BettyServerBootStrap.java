@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.ServiceLoader;
 
 import org.apache.commons.digester.Digester;
+import org.slf4j.Logger;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -19,7 +20,9 @@ import io.betty.BettyModuleListenerProvider;
 import io.betty.BettyModuleProvider;
 import io.betty.server.BettyServer;
 import io.betty.server.digester.DigesterFactory;
+import io.betty.server.exec.BettyThreadPoolExecutor;
 import io.betty.util.BettyLog4jInitializer;
+import io.betty.util.InternalSlf4JLoggerFactory;
 
 public class BettyServerBootStrap {
 	
@@ -81,22 +84,34 @@ public class BettyServerBootStrap {
 	
 	public static void main(String[] args) throws Exception {
 		
+		Logger logger = InternalSlf4JLoggerFactory.getLogger(BettyServerBootStrap.class);
+		
 		Injector injector = Guice.createInjector(loadModules());
 		
 		Digester digester = DigesterFactory.createDigester(injector);
 		
 		BettyServer server = BettyServerBootStrap.server = injector.getInstance(BettyServer.class);
 
-		startServer(injector, server, digester);
+		startServer(injector, server, digester, logger);
 	}
 	
-	private static void startServer(Injector injector, BettyServer server,Digester digester) throws Exception {
+	private static void startServer(Injector injector, BettyServer server,Digester digester, Logger logger) throws Exception {
 
 		digester.push(server);
 		digester.parse(serverXmlConfFile);
 		
 		if(server.getExecutor() == null) {
-			server.setExecutor(injector.getInstance(BettyExecutor.class));
+			
+			BettyExecutor executor = null;
+			
+			try {
+				executor = injector.getInstance(BettyExecutor.class);
+			} catch (Exception e) {
+				logger.info("No betty executor found, use default executor: {}.", BettyThreadPoolExecutor.class.getName());
+				executor = injector.getInstance(BettyThreadPoolExecutor.class);
+			}
+			
+			server.setExecutor(executor);
 		}
 		
 		addModuleLifecycleListeners(server);

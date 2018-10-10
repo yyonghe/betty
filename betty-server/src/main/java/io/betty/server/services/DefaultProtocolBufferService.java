@@ -2,6 +2,8 @@ package io.betty.server.services;
 
 import org.slf4j.Logger;
 
+import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.google.protobuf.Message;
 import com.google.protobuf.TextFormat;
 
@@ -21,6 +23,11 @@ import kilim.Pausable;
 public class DefaultProtocolBufferService extends AbstractService implements BettyService, Lifecycle {
 	
 	private static final Logger logger = InternalSlf4JLoggerFactory.getLogger(DefaultProtocolBufferService.class);
+	
+	@Inject
+	public DefaultProtocolBufferService(Injector injector) {
+		super(injector);
+	}
 	
 	@Override
 	public void doService(ChannelHandlerContext ctx, BettyServerContext bctx) throws Pausable, SuspendExecution, Exception {

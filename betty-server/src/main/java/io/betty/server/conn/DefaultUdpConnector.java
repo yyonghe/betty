@@ -3,7 +3,6 @@ package io.betty.server.conn;
 import org.slf4j.Logger;
 
 import io.betty.lifecycle.LifecycleException;
-import io.betty.lifecycle.LifecycleState;
 import io.betty.server.BettyConnector;
 import io.betty.server.DefaultServerChannelInitializer;
 import io.betty.util.InternalSlf4JLoggerFactory;
@@ -60,7 +59,6 @@ public class DefaultUdpConnector extends DefaultConnector implements BettyConnec
 	
 	@Override
 	protected void startInternal() throws LifecycleException {
-		setState(LifecycleState.STARTING);
 		//
 		ChannelFuture future = null;
 		

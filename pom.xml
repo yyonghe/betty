@@ -23,7 +23,6 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<skipTests>true</skipTests>
-<!-- 		<maven.test.skip>true</maven.test.skip> -->
 		<project.build.os/>
 		<!-- native support -->
 		<native.compile.required>false</native.compile.required>
@@ -34,8 +33,8 @@
 		
 		<tools.build.app>true</tools.build.app>
 		<!-- application args -->
-		<java.jvm.command.args>-Xms512m -Xmx2048m</java.jvm.command.args>
-		<java.app.command.args/>
+		<java.jvm.args>-Xms512m -Xmx2048m</java.jvm.args>
+		<java.app.args/>
 		
 		<!-- ant dependencies version -->
 		<ant.version>1.9.9</ant.version>
@@ -88,11 +87,6 @@
 				<version>4.1.29.Final</version>
 			</dependency>
 
-<!-- 			<dependency> -->
-<!-- 				<groupId>kilim</groupId> -->
-<!-- 				<artifactId>kilim</artifactId> -->
-<!-- 				<version>1.0.7</version> -->
-<!-- 			</dependency> -->
 			<dependency>
 				<groupId>org.db4j</groupId>
 				<artifactId>kilim</artifactId>
@@ -105,7 +99,6 @@
 			    <artifactId>ant</artifactId>
 			    <version>${ant.version}</version>
 			</dependency>
-		
 		
 		</dependencies>
 
@@ -268,46 +261,11 @@
 										<equals arg1="true" arg2="${build.package.avilable}"/>
 										<then>
 											<property name="app.dir" value="${project.basedir}"/>
-											<taskdef name="BettyScriptWriterTask" classname="io.betty.ant.tools.BettyScriptExportTask" classpath="${project.build.directory}/classes:${io.betty:betty-common:jar}"/>
-											<BettyScriptWriterTask bindir="${app.dir}/bin"/>
-											<!-- build script -->
-											<property name="start.sh" value="${app.dir}/bin/start.sh"/>
-											<echo file="${start.sh}" append="false" message="#!/bin/sh${line.separator}"/>
-											<echo file="${start.sh}" append="true" message="_BETTY_SCRIPT_BIN_DIR=$$(cd $$(dirname $$0);pwd)${line.separator}"/>
-											<echo file="${start.sh}" append="true" message="_BETTY_SCRIPT_JVM_ARGS=&quot;${java.jvm.command.args}&quot;${line.separator}"/>
-											<echo file="${start.sh}" append="true" message="_BETTY_SCRIPT_APP_ARGS=&quot;${java.app.command.args}&quot;${line.separator}"/>
-											<echo file="${start.sh}" append="true" message=". $${_BETTY_SCRIPT_BIN_DIR}/betty.sh${line.separator}"/>
-											<echo file="${start.sh}" append="true" message="betty_main "/>
-											<echo file="${start.sh}" append="true" message="$${_BETTY_SCRIPT_BIN_DIR} "/>
-											<echo file="${start.sh}" append="true" message="start "/>
-											<echo file="${start.sh}" append="true" message="${project.artifactId} "/>
-											<echo file="${start.sh}" append="true" message="${project.version} "/>
-											<echo file="${start.sh}" append="true" message="${line.separator}"/>
-											<echo file="${start.sh}" append="true" message="${line.separator}"/>
-											<property name="kill.sh" value="${app.dir}/bin/kill.sh"/>
-											<echo file="${kill.sh}" append="false" message="#!/bin/sh${line.separator}"/>
-											<echo file="${kill.sh}" append="true" message="_BETTY_SCRIPT_BIN_DIR=$$(dirname $$0)${line.separator}"/>
-											<echo file="${kill.sh}" append="true" message="_BETTY_SCRIPT_BIN_DIR=$$(cd $$(dirname $$0);pwd)${line.separator}"/>
-											<echo file="${kill.sh}" append="true" message=". ${_BETTY_SCRIPT_BIN_DIR}/betty.sh${line.separator}"/>
-											<echo file="${kill.sh}" append="true" message="betty_main "/>
-											<echo file="${kill.sh}" append="true" message="$${_BETTY_SCRIPT_BIN_DIR} "/>
-											<echo file="${kill.sh}" append="true" message="kill "/>
-											<echo file="${kill.sh}" append="true" message="${project.artifactId} "/>
-											<echo file="${kill.sh}" append="true" message="${line.separator}"/>
-											<echo file="${kill.sh}" append="true" message="${line.separator}"/>
-											<property name="run.sh" value="${app.dir}/bin/run.sh"/>
-											<echo file="${run.sh}" append="false" message="#!/bin/sh${line.separator}"/>
-											<echo file="${run.sh}" append="true" message="_BETTY_SCRIPT_BIN_DIR=$$(cd $$(dirname $$0);pwd)${line.separator}"/>
-											<echo file="${run.sh}" append="true" message="_BETTY_SCRIPT_JVM_ARGS=&quot;${java.jvm.command.args}&quot;${line.separator}"/>
-											<echo file="${run.sh}" append="true" message="_BETTY_SCRIPT_APP_ARGS=&quot;${java.app.command.args}&quot;${line.separator}"/>
-											<echo file="${run.sh}" append="true" message=". $${_BETTY_SCRIPT_BIN_DIR}/betty.sh${line.separator}"/>
-											<echo file="${run.sh}" append="true" message="betty_main "/>
-											<echo file="${run.sh}" append="true" message="$${_BETTY_SCRIPT_BIN_DIR} "/>
-											<echo file="${run.sh}" append="true" message="run "/>
-											<echo file="${run.sh}" append="true" message="${project.artifactId} "/>
-											<echo file="${run.sh}" append="true" message="${project.version} "/>
-											<echo file="${run.sh}" append="true" message="${line.separator}"/>
-											<echo file="${run.sh}" append="true" message="${line.separator}"/>
+											<taskdef name="BettyScriptWriterTask" classname="io.betty.ant.tools.BettyScriptExportTask"
+															classpath="${project.build.directory}/classes:${io.betty:betty-common:jar}"/>
+															
+											<BettyScriptWriterTask basedir="${app.dir}" appname="${project.name}"
+												version="${project.version}" jvmargs="${java.jvm.args}" appargs="${java.app.args}"/>
 										</then>
 									</if>
 								</target>
