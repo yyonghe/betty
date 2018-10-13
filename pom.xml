@@ -15,6 +15,7 @@
 		<module>betty-report</module>
 		<module>betty-example</module>
 		<module>betty-kilim</module>
+<!--     	<module>betty-all</module> -->
   </modules>
 
 	<properties>
@@ -109,11 +110,6 @@
 		<directory>${project.basedir}/target${project.build.os}</directory>
 		<pluginManagement>
 			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-release-plugin</artifactId>
-					<version>2.0</version>
-				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-antrun-plugin</artifactId>
@@ -261,17 +257,83 @@
 										<equals arg1="true" arg2="${build.package.avilable}"/>
 										<then>
 											<property name="app.dir" value="${project.basedir}"/>
-											<taskdef name="BettyScriptWriterTask" classname="io.betty.ant.tools.BettyScriptExportTask"
-															classpath="${project.build.directory}/classes:${io.betty:betty-common:jar}"/>
+											<taskdef name="BettyScriptWriterTask" classname="io.betty.ant.tools.BettyScriptExportTask" classpath="${project.build.directory}/classes:${io.betty:betty-common:jar}"/>
 															
-											<BettyScriptWriterTask basedir="${app.dir}" appname="${project.name}"
-												version="${project.version}" jvmargs="${java.jvm.args}" appargs="${java.app.args}"/>
+											<BettyScriptWriterTask basedir="${app.dir}" appname="${project.name}" version="${project.version}" jvmargs="${java.jvm.args}" appargs="${java.app.args}"/>
 										</then>
 									</if>
 								</target>
 							</configuration>
 						</execution>
 					</executions>
+				</plugin>
+				<plugin>
+				  <artifactId>maven-source-plugin</artifactId>
+				  <version>3.0.1</version>
+				  <!-- Eclipse-related OSGi manifests
+				       See https://github.com/netty/netty/issues/3886
+				       More information: http://rajakannappan.blogspot.ie/2010/03/automating-eclipse-source-bundle.html -->
+				  <configuration>
+				    <archive>
+				      <manifestEntries>
+				        <Bundle-ManifestVersion>2</Bundle-ManifestVersion>
+				        <Bundle-Name>${project.name}</Bundle-Name>
+				        <Bundle-SymbolicName>${project.groupId}.${project.artifactId}.source</Bundle-SymbolicName>
+				      </manifestEntries>
+				    </archive>
+				  </configuration>
+				
+				  <executions>
+				    <!--
+				      ~ This workaround prevents Maven from executing the 'generate-sources' phase twice.
+				      ~ See http://jira.codehaus.org/browse/MSOURCES-13
+				      ~ and http://blog.peterlynch.ca/2010/05/maven-how-to-prevent-generate-sources.html
+				      -->
+				    <execution>
+				      <id>attach-sources</id>
+				      <phase>invalid</phase>
+				      <goals>
+				        <goal>jar</goal>
+				      </goals>
+				    </execution>
+				    <execution>
+				      <id>attach-sources-no-fork</id>
+				      <phase>package</phase>
+				      <goals>
+				        <goal>jar-no-fork</goal>
+				      </goals>
+				    </execution>
+				  </executions>
+				</plugin>
+				<plugin>
+				  <artifactId>maven-compiler-plugin</artifactId>
+				  <version>3.6.0</version>
+				  <configuration>
+				    <compilerVersion>1.8</compilerVersion>
+				    <fork>true</fork>
+				    <source>${maven.compiler.source}</source>
+				    <target>${maven.compiler.target}</target>
+				    <debug>true</debug>
+				    <optimize>true</optimize>
+				    <showDeprecation>true</showDeprecation>
+<!-- 				    <showWarnings>true</showWarnings> -->
+				    <compilerArgument>-Xlint:unchecked</compilerArgument>
+				    <meminitial>256m</meminitial>
+				    <maxmem>1024m</maxmem>
+				    <excludes>
+				      <exclude>**/package-info.java</exclude>
+				    </excludes>
+				  </configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>build-helper-maven-plugin</artifactId>
+					<version>3.0.0</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-release-plugin</artifactId>
+					<version>2.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -285,6 +347,11 @@
 					<configuration>
 						<skipTests>${skipTests}</skipTests>
 					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<version>3.1.1</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>

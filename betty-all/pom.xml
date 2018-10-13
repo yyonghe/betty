@@ -1,0 +1,188 @@
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>io.betty</groupId>
+		<artifactId>betty-parent</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<artifactId>betty-all</artifactId>
+	<name>betty-all</name>
+	<url>http://maven.apache.org</url>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<tools.build.app>false</tools.build.app>
+
+		<betty.generated.source.dir>${project.build.directory}/src</betty.generated.source.dir>
+		<betty.generated.services.dir>${project.build.directory}/services</betty.generated.services.dir>
+
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>betty-common</artifactId>
+			<version>${project.version}</version>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>betty-server</artifactId>
+			<version>${project.version}</version>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<!-- Populate the properties whose key is groupId:artifactId:type and 
+						whose value is the path to the artifact -->
+					<execution>
+						<id>locate-dependencies</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>properties</goal>
+						</goals>
+					</execution>
+
+					<!-- Unpack all source files -->
+					<execution>
+						<id>unpack-sources</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>unpack-dependencies</goal>
+						</goals>
+						<configuration>
+							<classifier>sources</classifier>
+							<includes>io/betty/**</includes>
+							<includeScope>runtime</includeScope>
+							<includeGroupIds>${project.groupId}</includeGroupIds>
+							<outputDirectory>${betty.generated.source.dir}</outputDirectory>
+						</configuration>
+					</execution>
+
+					<!-- Unpack all class files -->
+					<execution>
+						<id>unpack-jars</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>unpack-dependencies</goal>
+						</goals>
+						<configuration>
+							<includes>io/betty/**,META-INF/**</includes>
+							<includeScope>runtime</includeScope>
+							<includeGroupIds>${project.groupId}</includeGroupIds>
+							<outputDirectory>${project.build.outputDirectory}</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>merge-services</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<taskdef resource="net/sf/antcontrib/antlib.xml" />
+								<delete quiet="true" dir="${project.build.outputDirectory}/META-INF/services" />
+								<propertyselector property="services"
+									match="^(${project.groupId}:(?!betty-example)[^:]+:jar(?::[^:]+)?)$"
+									select="\1" />
+								<for list="${services}" param="x">
+									<sequential>
+										<unzip src="${@{x}}" dest="${betty.generated.services.dir}">
+											<patternset>
+												<include name="META-INF/services/io.betty.BettyModuleProvider" />
+												<include name="META-INF/services/io.betty.BettyModuleListenerProvider" />
+											</patternset>
+										</unzip>
+										<if>
+											<available type="file" file="${betty.generated.services.dir}/META-INF/services/io.betty.BettyModuleProvider" />
+											<then>
+											<concat append="true" destfile="${project.build.outputDirectory}/META-INF/services/io.betty.BettyModuleProvider">
+												<path path="${betty.generated.services.dir}/META-INF/services/io.betty.BettyModuleProvider" />
+											</concat>
+											</then>
+										</if>
+										<if>
+											<available type="file" file="${betty.generated.services.dir}/META-INF/services/io.betty.BettyModuleListenerProvider" />
+											<then>
+											<concat append="true" destfile="${project.build.outputDirectory}/META-INF/services/io.betty.BettyModuleListenerProvider">
+												<path path="${betty.generated.services.dir}/META-INF/services/io.betty.BettyModuleListenerProvider" />
+											</concat>
+											</then>
+										</if>
+										<delete quiet="true" dir="${betty.generated.services.dir}/META-INF/services" />
+									</sequential>
+								</for>
+								<delete quiet="true" dir="${betty.generated.services.dir}" />
+							</target>
+						</configuration>
+					</execution>
+
+				</executions>
+			</plugin>
+			<!-- Include the directory where the source files were unpacked -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>add-source</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>${betty.generated.source.dir}</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>default-jar</id>
+						<phase>none</phase>
+					</execution>
+					<execution>
+						<id>all-in-one-jar</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<archive>
+								<manifest>
+									<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+								</manifest>
+								<manifestEntries>
+									<Automatic-Module-Name>io.betty.all</Automatic-Module-Name>
+								</manifestEntries>
+								<index>true</index>
+							</archive>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-source-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>
