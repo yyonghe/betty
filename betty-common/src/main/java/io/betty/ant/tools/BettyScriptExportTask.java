@@ -121,7 +121,7 @@ public class BettyScriptExportTask extends Task {
 					}
 					//
 					writer.write(line);
-					writer.newLine();
+					writer.write("\n");
 				}
 			} finally {
 				if(writer != null) {
