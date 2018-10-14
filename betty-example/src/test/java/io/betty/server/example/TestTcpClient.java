@@ -16,7 +16,7 @@ public class TestTcpClient extends TestCase {
 
 	public void testRun() throws Exception {
 		
-		BettyClient client = new DefaultClient(new String[]{"192.168.215.129"}, 
+		BettyClient client = new DefaultClient(new String[]{"127.0.0.1"}, 
 				new int[] {8080}, new BettyThreadPoolResultWaitStrategy(), new StringProtocolCoder());
 		
 		

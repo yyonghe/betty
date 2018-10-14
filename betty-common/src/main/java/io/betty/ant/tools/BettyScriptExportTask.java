@@ -101,7 +101,7 @@ public class BettyScriptExportTask extends Task {
 		}
 		File dst = new File(basedirFile, filename);
 		log("Exporting script " + filename + " to " + dst.getAbsolutePath());
-		if("betty.sh".equals(filename)) {
+		if("betty.sh".equals(filename) || "betty.bat".equals(filename)) {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(classLoader.getResourceAsStream(resName)));
 			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(dst)));
 			
@@ -116,7 +116,7 @@ public class BettyScriptExportTask extends Task {
 						if(value == null) {
 							throw new IllegalArgumentException("No value set to var " + token.name);
 						}
-						log("Exporting script " + filename + " resolved arg " + token.name + "=" + value);
+						log("Exporting script " + filename + " resolved variable " + token.name + "=\"" + value + "\"");
 						line = line.replace(token.fullname, value);
 					}
 					//

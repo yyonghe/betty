@@ -190,13 +190,24 @@
 							<configuration>
 								<target if="${tools.build.app}">
 									<taskdef resource="net/sf/antcontrib/antlib.xml"/>
-									<condition property="build.package.avilable">
+									<condition property="isLinux">
 										<and>
 											<contains string="${os.name}" substring="Linux"/>
-											<not>
-											<equals arg1="${project.artifactId}" arg2="betty-parent"/>
-											</not>
 										</and>
+									</condition>
+									<if>
+										<equals arg1="true" arg2="${isLinux}"/>
+										<then>
+											<property name="classpath.delimiter" value=":"/>
+										</then>
+										<else>
+											<property name="classpath.delimiter" value=";"/>
+										</else>
+									</if>
+									<condition property="build.package.avilable">
+										<not>
+										<equals arg1="${project.artifactId}" arg2="betty-parent"/>
+										</not>
 									</condition>
 									<if>
 										<equals arg1="true" arg2="${build.package.avilable}"/>
@@ -210,7 +221,7 @@
 											<mkdir dir="${app.dir}/conf"/>
 											<mkdir dir="${app.dir}/logs"/>
 											<mkdir dir="${app.dir}/tmp"/>
-											<for list="${ref.maven.compile.classpath}" delimiter=":" param="jarpath">
+											<for list="${ref.maven.compile.classpath}" delimiter="${classpath.delimiter}" param="jarpath">
 												<sequential>
 													<if>
 														<contains string="@{jarpath}" substring=".jar"/>
@@ -246,12 +257,9 @@
 								<target if="${tools.build.app}">
 									<taskdef resource="net/sf/antcontrib/antlib.xml"/>
 									<condition property="build.package.avilable">
-										<and>
-											<contains string="${os.name}" substring="Linux"/>
-											<not>
-											<equals arg1="${project.artifactId}" arg2="betty-parent"/>
-											</not>
-										</and>
+										<not>
+										<equals arg1="${project.artifactId}" arg2="betty-parent"/>
+										</not>
 									</condition>
 									<if>
 										<equals arg1="true" arg2="${build.package.avilable}"/>
@@ -270,9 +278,6 @@
 				<plugin>
 				  <artifactId>maven-source-plugin</artifactId>
 				  <version>3.0.1</version>
-				  <!-- Eclipse-related OSGi manifests
-				       See https://github.com/netty/netty/issues/3886
-				       More information: http://rajakannappan.blogspot.ie/2010/03/automating-eclipse-source-bundle.html -->
 				  <configuration>
 				    <archive>
 				      <manifestEntries>
@@ -282,13 +287,7 @@
 				      </manifestEntries>
 				    </archive>
 				  </configuration>
-				
 				  <executions>
-				    <!--
-				      ~ This workaround prevents Maven from executing the 'generate-sources' phase twice.
-				      ~ See http://jira.codehaus.org/browse/MSOURCES-13
-				      ~ and http://blog.peterlynch.ca/2010/05/maven-how-to-prevent-generate-sources.html
-				      -->
 				    <execution>
 				      <id>attach-sources</id>
 				      <phase>invalid</phase>
@@ -320,20 +319,21 @@
 				    <compilerArgument>-Xlint:unchecked</compilerArgument>
 				    <meminitial>256m</meminitial>
 				    <maxmem>1024m</maxmem>
-				    <excludes>
-				      <exclude>**/package-info.java</exclude>
-				    </excludes>
+				  </configuration>
+				</plugin>
+				<plugin>
+				  <artifactId>maven-release-plugin</artifactId>
+				  <!-- Downgrade to 2.4.1 if release fails -->
+				  <version>2.5.3</version>
+				  <configuration>
+				    <useReleaseProfile>false</useReleaseProfile>
+				    <allowTimestampedSnapshots>false</allowTimestampedSnapshots>
 				  </configuration>
 				</plugin>
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>build-helper-maven-plugin</artifactId>
 					<version>3.0.0</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-release-plugin</artifactId>
-					<version>2.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>

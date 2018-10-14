@@ -20,7 +20,7 @@ betty_resourvle_classspath()
 
 betty_start()
 {
-	cd ${_BIN_DIR}
+#	cd ${_BIN_DIR}
 	_pid=`pgrep -f ^.*java.*${_appname}.*jar.*$`
 	if [ -n "${_pid}" ];then
 		echo "Process ${_appname} is running."
@@ -49,16 +49,16 @@ betty_run()
 	#firstly try to kill
 	betty_kill
 
-	cd ${_BIN_DIR}
+#	cd ${_BIN_DIR}
 	betty_resourvle_classspath betty-common betty-server
 	${JAVA_HOME}/bin/java -classpath ${_CLASSPATH} ${_jvmargs} -Dbetty.work.dir=${_PWD_DIR} -Dbetty.appname=${_appname} io.betty.server.bootstrap.BettyServerBootStrap ${_appargs}
 }
 
 betty_main()
 {
-	_BIN_DIR=$1
-	_CMD=$2
-	_PWD_DIR=$(cd $_BIN_DIR;cd ..;pwd)
+	# _BIN_DIR=$1
+	# _CMD=$2
+	# _PWD_DIR=$(cd $_BIN_DIR;cd ..;pwd)
 	_CLASSPATH=""
 	
 	if [ "start" = "${_CMD}" ];then
