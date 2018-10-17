@@ -6,8 +6,8 @@ import java.net.SocketAddress;
 import co.paralleluniverse.fibers.SuspendExecution;
 import io.betty.BettyClientContext;
 import io.betty.BettyLoadBalance;
-import io.betty.BettyProtocolCoder;
 import io.betty.BettyLoadBalance.BasicSn;
+import io.betty.BettyProtocolCodec;
 import io.betty.util.MiscUtils;
 import io.netty.channel.ChannelHandlerContext;
 import kilim.Pausable;
@@ -39,7 +39,7 @@ public class DefaultClientContext implements BettyClientContext {
 	@SuppressWarnings("rawtypes")
 	private BettyLoadBalance loadBalance;
 	
-	private BettyProtocolCoder protocolCoder;
+	private BettyProtocolCodec protocolcodec;
 	
 	/**
 	 * To create non-zero code response.
@@ -183,16 +183,16 @@ public class DefaultClientContext implements BettyClientContext {
 	}
 
 	/**
-	 * @return the protocolCoder
+	 * @return the protocolcodec
 	 */
-	public BettyProtocolCoder getProtocolCoder() {
-		return protocolCoder;
+	public BettyProtocolCodec getProtocolCodec() {
+		return protocolcodec;
 	}
 
 	/**
-	 * @param protocolCoder the protocolCoder to set
+	 * @param protocolcodec the protocolcodec to set
 	 */
-	public void setProtocolCoder(BettyProtocolCoder protocolCoder) {
-		this.protocolCoder = protocolCoder;
+	public void setProtocolCodec(BettyProtocolCodec protocolcodec) {
+		this.protocolcodec = protocolcodec;
 	}
 }

@@ -2,7 +2,7 @@ package io.betty.server.conn;
 
 import org.slf4j.Logger;
 
-import io.betty.BettyProtocolCoder;
+import io.betty.BettyProtocolCodec;
 import io.betty.lifecycle.LifecycleBase;
 import io.betty.lifecycle.LifecycleException;
 import io.betty.server.BettyConnector;
@@ -24,7 +24,7 @@ public abstract class DefaultConnector extends LifecycleBase implements BettyCon
 
 	private BettyConnector.Kind kind;
 
-	private BettyProtocolCoder protocolCoder;
+	private BettyProtocolCodec protocolcodec;
 
 	private String options;
 	
@@ -148,18 +148,18 @@ public abstract class DefaultConnector extends LifecycleBase implements BettyCon
 	}
 
 	/**
-	 * @return the protocolCoder
+	 * @return the protocolcodec
 	 */
-	public BettyProtocolCoder getProtocolCoder() {
-		return protocolCoder;
+	public BettyProtocolCodec getProtocolCodec() {
+		return protocolcodec;
 	}
 
 	/**
-	 * @param protocolCoder
-	 *            the protocolCoder to set
+	 * @param protocolcodec
+	 *            the protocolcodec to set
 	 */
-	public void setProtocolCoder(BettyProtocolCoder protocolCoder) {
-		this.protocolCoder = protocolCoder;
+	public void setProtocolCodec(BettyProtocolCodec protocolcodec) {
+		this.protocolcodec = protocolcodec;
 	}
 
 	/**
@@ -181,7 +181,7 @@ public abstract class DefaultConnector extends LifecycleBase implements BettyCon
 	
 	@Override
 	public String getName() {
-		return "connector:" + kind + ":" + host + ":" + port + "//[" + protocol + "]" + protocolCoder;
+		return "connector:" + kind + ":" + host + ":" + port + "//[" + protocol + "]" + protocolcodec;
 	}
 	
 	/**
@@ -197,8 +197,8 @@ public abstract class DefaultConnector extends LifecycleBase implements BettyCon
 		builder.append(kind);
 		builder.append(", protocol=");
 		builder.append(protocol);
-		builder.append(", protocolCoder=");
-		builder.append(protocolCoder);
+		builder.append(", protocolcodec=");
+		builder.append(protocolcodec);
 		builder.append("]");
 		return builder.toString();
 	}

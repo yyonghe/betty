@@ -3,7 +3,7 @@ package io.betty.server;
 import java.net.SocketAddress;
 
 import co.paralleluniverse.fibers.SuspendExecution;
-import io.betty.BettyProtocolCoder;
+import io.betty.BettyProtocolCodec;
 import io.betty.util.MiscUtils;
 import io.netty.channel.ChannelHandlerContext;
 import kilim.Pausable;
@@ -37,7 +37,7 @@ public class DefaultServerContext implements BettyServerContext {
 	
 	private String retMessage = "ok";
 	
-	private BettyProtocolCoder protocolCoder;
+	private BettyProtocolCodec protocolcodec;
 	
 	public DefaultServerContext(long uid, String cmd, String subcmd, Object request) {
 		this.seq = MiscUtils.SG.getAndIncrement();
@@ -178,17 +178,17 @@ public class DefaultServerContext implements BettyServerContext {
 	}
 
 	/**
-	 * @return the protocolCoder
+	 * @return the protocolcodec
 	 */
-	public BettyProtocolCoder getProtocolCoder() {
-		return protocolCoder;
+	public BettyProtocolCodec getProtocolCodec() {
+		return protocolcodec;
 	}
 
 	/**
-	 * @param protocolCoder the protocolCoder to set
+	 * @param protocolcodec the protocolcodec to set
 	 */
-	public void setProtocolCoder(BettyProtocolCoder protocolCoder) {
-		this.protocolCoder = protocolCoder;
+	public void setProtocolCodec(BettyProtocolCodec protocolcodec) {
+		this.protocolcodec = protocolcodec;
 	}
 	
 	@Override
@@ -210,9 +210,9 @@ public class DefaultServerContext implements BettyServerContext {
 		builder.append(", remote=");
 		builder.append(remote);
 		builder.append(", request=");
-		builder.append(protocolCoder.toString(request));
+		builder.append(protocolcodec.toString(request));
 		builder.append(", response=");
-		builder.append(protocolCoder.toString(response));
+		builder.append(protocolcodec.toString(response));
 		builder.append(", service=");
 		builder.append(service);
 		builder.append("]");

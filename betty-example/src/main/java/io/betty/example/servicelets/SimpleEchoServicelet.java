@@ -1,7 +1,7 @@
 package io.betty.example.servicelets;
 
 import co.paralleluniverse.fibers.SuspendExecution;
-import io.betty.coders.StringProtocolPacket;
+import io.betty.codecs.StringProtocolPacket;
 import io.betty.server.BettyServerContext;
 import io.betty.server.BettyServicelet;
 import kilim.Pausable;

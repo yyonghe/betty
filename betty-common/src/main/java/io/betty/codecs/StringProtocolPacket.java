@@ -1,4 +1,4 @@
-package io.betty.coders;
+package io.betty.codecs;
 
 public class StringProtocolPacket {
 

@@ -52,8 +52,8 @@ public interface BettyContext {
 	 */
 	public String getRetMessage();
 	
-	public void setProtocolCoder(BettyProtocolCoder protocolCoder);
-	public BettyProtocolCoder getProtocolCoder();
+	public void setProtocolCodec(BettyProtocolCodec protocolcodec);
+	public BettyProtocolCodec getProtocolCodec();
 	
 	public void startContext(ChannelHandlerContext ctx) throws Pausable, SuspendExecution, Exception;
 }

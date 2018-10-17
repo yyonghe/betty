@@ -9,7 +9,7 @@ import org.xml.sax.Attributes;
 
 import com.google.inject.Injector;
 
-import io.betty.BettyProtocolCoder;
+import io.betty.BettyProtocolCodec;
 import io.betty.server.BettyConnector;
 import io.betty.server.BettyServer;
 import io.betty.server.conn.DefaultTcpConnector;
@@ -97,36 +97,33 @@ public class ConnectorCreateRule extends Rule {
 		conn.setKind(okind);
 		conn.setServer((BettyServer) digester.peek());
 		//
-//		if(PlatformDependent.isWindows()) {
-//			conn.setHost(MiscUtils.getLocalInet4Address("eth1"));
-//		} else {
-//			conn.setHost(MiscUtils.getLocalInet4Address("eth0"));
-//		}
 		// Build a set of attribute names and corresponding values
         HashMap<String, String> values = new HashMap<String, String>();
         //
+        boolean ethConfiged = false;
     	int al = attributes.getLength();
 		for (int i = 0; i < al; i++) {
     		String qn = attributes.getQName(i).trim().toLowerCase();
     		String value = attributes.getValue(i).trim();
-    		if("kind".equals(qn) || "protocolCoder".equals(qn)) {
+    		if("kind".equals(qn) || "protocolcodec".equals(qn)) {
     			// do nothing...
     			continue;
     		} else if("protocol".equals(qn)) {
-    			BettyProtocolCoder pc = null;
+    			BettyProtocolCodec pc = null;
     			value = value.toUpperCase();
     			if("ILIVE".equals(value)) {
-    				pc = injector.getInstance(io.betty.coders.ILivePrototcolCoder.class);
+    				pc = injector.getInstance(io.betty.codecs.ILivePrototcolCodec.class);
     			} else if("HTTP/1.1".equals(value)) {
-    				pc = injector.getInstance(io.betty.coders.ILivePrototcolCoder.class);
+    				pc = injector.getInstance(io.betty.codecs.ILivePrototcolCodec.class);
     			} else if("STRING".equals(value)) {
-    				pc = injector.getInstance(io.betty.server.coders.StringServerProtocolCoder.class);
+    				pc = injector.getInstance(io.betty.codecs.StringProtocolCodec.class);
     			} else {
     				
     			}
     			conn.setProtocol(value);
-    			conn.setProtocolCoder(pc);
+    			conn.setProtocolCodec(pc);
     		} else if("eth".equals(qn)) {
+    			ethConfiged = true;
     			value = value.toLowerCase();
     			String host = MiscUtils.getLocalInet4Address(value);
     			conn.setHost(host);
@@ -134,6 +131,16 @@ public class ConnectorCreateRule extends Rule {
     			values.put(qn, value);
     		}
     	}
+		if(!ethConfiged) {
+			// try to use eth0
+			try {
+				String host = MiscUtils.getLocalInet4Address("eth0");
+				conn.setHost(host);
+			} catch (Exception e) {
+				logger.warn("No eth configed and default eth0 is not avaliable for {}, "
+						+ "so will bind to 0.0.0.0", e.getMessage());
+			}
+		}
 		//
 		BeanUtils.populate(conn, values);
 		//

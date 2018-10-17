@@ -50,7 +50,7 @@ public class DefaultTcpEpollConnector extends DefaultConnector implements BettyC
 		if(InternalSlf4JLoggerFactory.isEnableDump()) {
 			bootstrap.handler(new LoggingHandler());
 		}
-		bootstrap.childHandler(new DefaultServerChannelInitializer<EpollSocketChannel>(this, getProtocolCoder()));
+		bootstrap.childHandler(new DefaultServerChannelInitializer<EpollSocketChannel>(this, getProtocolCodec()));
 		//
 		this.bootstrap = bootstrap;
 		this.bossGroup = bossGroup;

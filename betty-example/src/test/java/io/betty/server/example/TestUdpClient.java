@@ -4,8 +4,8 @@ import java.util.Random;
 
 import io.betty.BettyClientContext;
 import io.betty.client.DefaultClient;
-import io.betty.coders.StringProtocolCoder;
-import io.betty.coders.StringProtocolPacket;
+import io.betty.codecs.StringProtocolCodec;
+import io.betty.codecs.StringProtocolPacket;
 import io.betty.kilim.BettyKilimExecutorResultWaitStrategy;
 import junit.framework.TestCase;
 
@@ -16,7 +16,7 @@ public class TestUdpClient extends TestCase {
 	public void testRun() throws Exception {
 		
 		DefaultClient client = new DefaultClient(new String[]{"192.168.215.129"}, 
-				new int[] {8087}, new BettyKilimExecutorResultWaitStrategy(), new StringProtocolCoder());
+				new int[] {8087}, new BettyKilimExecutorResultWaitStrategy(), new StringProtocolCodec());
 		client.useUdp();
 		
 		StringProtocolPacket req = new StringProtocolPacket(new Random().nextInt(2100000000),
@@ -27,7 +27,7 @@ public class TestUdpClient extends TestCase {
 		try {
 			StringProtocolPacket rsp = client.waitFor(reqctx);
 			
-			System.out.println("rrrrrr: " + reqctx.getProtocolCoder().toString(rsp));
+			System.out.println("rrrrrr: " + reqctx.getProtocolCodec().toString(rsp));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

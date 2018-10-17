@@ -13,10 +13,10 @@ import co.paralleluniverse.fibers.SuspendExecution;
 import io.betty.BettyClient;
 import io.betty.BettyClientContext;
 import io.betty.BettyLoadBalance;
-import io.betty.BettyProtocolCoder;
-import io.betty.BettyResultWaitStrategy;
 import io.betty.BettyLoadBalance.BasicSn;
 import io.betty.BettyLoadBalance.BasicSnParam;
+import io.betty.BettyProtocolCodec;
+import io.betty.BettyResultWaitStrategy;
 import io.betty.lb.RoundRobineLoadBalance;
 import io.betty.util.InternalSlf4JLoggerFactory;
 import io.betty.util.IntrospectionUtils;
@@ -58,7 +58,7 @@ public class DefaultClient implements BettyClient {
 	
 	private BettyResultWaitStrategy resultWaitStrategy;
 	
-	private BettyProtocolCoder protocolCoder;
+	private BettyProtocolCodec protocolcodec;
 	
 	protected BettyLoadBalance loadBalance = new RoundRobineLoadBalance();
 	
@@ -79,11 +79,11 @@ public class DefaultClient implements BettyClient {
 	private Boolean INIT = true;
 	
 	public DefaultClient(String[] hosts, int[] ports, 
-			BettyResultWaitStrategy resultWaitStrategy, BettyProtocolCoder protocolCoder) {
+			BettyResultWaitStrategy resultWaitStrategy, BettyProtocolCodec protocolcodec) {
 		this.hosts = hosts;
 		this.ports = ports;
 		this.resultWaitStrategy = resultWaitStrategy;
-		this.protocolCoder = protocolCoder;
+		this.protocolcodec = protocolcodec;
 	}
 	
 	
@@ -110,7 +110,7 @@ public class DefaultClient implements BettyClient {
 		reqctx.setBasicSn(sn);
 		reqctx.setLoadBalance(loadBalance);
 		reqctx.setWaitTime(timeout);
-		reqctx.setProtocolCoder(protocolCoder);
+		reqctx.setProtocolCodec(protocolcodec);
 		//
 		return send(group, reqctx);
 	}
@@ -209,7 +209,7 @@ public class DefaultClient implements BettyClient {
 		strbuilder.append("remote: ").append(reqctx.getRemote()).append(',');
 		strbuilder.append(reqctx.getSeq()).append(',');
 		strbuilder.append(reqctx.getUid()).append(',');
-		strbuilder.append('<').append(reqctx.getProtocolCoder().toString(reqctx.getData())).append('>').append(',');
+		strbuilder.append('<').append(reqctx.getProtocolCodec().toString(reqctx.getData())).append('>').append(',');
 		strbuilder.append('<').append(cause.getMessage()).append('>');
 		logger.error(strbuilder.toString(), cause);
 	}
@@ -242,11 +242,11 @@ public class DefaultClient implements BettyClient {
 				bootstrap.option(EpollChannelOption.SO_REUSEPORT, true);
 				bootstrap.option(EpollChannelOption.EPOLL_MODE, EpollMode.EDGE_TRIGGERED);
 				// Channel Initializer
-				bootstrap.handler(new DefaultClientChannelInitializer<EpollSocketChannel>(this, protocolCoder, tcp));
+				bootstrap.handler(new DefaultClientChannelInitializer<EpollSocketChannel>(this, protocolcodec, tcp));
 			} else {
 				bootstrap.channel(NioSocketChannel.class);
 				// Channel Initializer
-				bootstrap.handler(new DefaultClientChannelInitializer<NioSocketChannel>(this, protocolCoder, tcp));
+				bootstrap.handler(new DefaultClientChannelInitializer<NioSocketChannel>(this, protocolcodec, tcp));
 			}
 			// default options
 			bootstrap.option(ChannelOption.SO_BACKLOG, 100);
@@ -258,11 +258,11 @@ public class DefaultClient implements BettyClient {
 				bootstrap.option(EpollChannelOption.SO_REUSEPORT, true);
 				bootstrap.option(EpollChannelOption.EPOLL_MODE, EpollMode.EDGE_TRIGGERED);
 				// Channel Initializer
-				bootstrap.handler(new DefaultClientChannelInitializer<EpollDatagramChannel>(this, protocolCoder, tcp));
+				bootstrap.handler(new DefaultClientChannelInitializer<EpollDatagramChannel>(this, protocolcodec, tcp));
 			} else {
 				bootstrap.channel(NioDatagramChannel.class);
 				// Channel Initializer
-				bootstrap.handler(new DefaultClientChannelInitializer<NioDatagramChannel>(this, protocolCoder, tcp));
+				bootstrap.handler(new DefaultClientChannelInitializer<NioDatagramChannel>(this, protocolcodec, tcp));
 			}
 			// default options
 			bootstrap.option(ChannelOption.SO_REUSEADDR, true);

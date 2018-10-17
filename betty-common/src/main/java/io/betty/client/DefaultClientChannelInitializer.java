@@ -7,7 +7,8 @@ import org.slf4j.Logger;
 
 import io.betty.BettyClient;
 import io.betty.BettyClientContext;
-import io.betty.BettyProtocolCoder;
+import io.betty.BettyProtocolCodecOrigin;
+import io.betty.BettyProtocolCodec;
 import io.betty.util.InternalSlf4JLoggerFactory;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
@@ -29,13 +30,13 @@ public class DefaultClientChannelInitializer<C extends Channel> extends ChannelI
 	private static final Logger logger = InternalSlf4JLoggerFactory.getLogger(DefaultClientChannelInitializer.class);
 	
 	private BettyClient client;
-	private BettyProtocolCoder protocolCodec;
+	private BettyProtocolCodec protocolCodec;
 	private boolean tcp = true;
 
-	public DefaultClientChannelInitializer(BettyClient client, BettyProtocolCoder protocolCoder, boolean tcp) {
+	public DefaultClientChannelInitializer(BettyClient client, BettyProtocolCodec protocolcodec, boolean tcp) {
 		//
 		this.client = client;
-		this.protocolCodec = protocolCoder;
+		this.protocolCodec = protocolcodec;
 		this.tcp = tcp;
 	}
 	
@@ -47,11 +48,11 @@ public class DefaultClientChannelInitializer<C extends Channel> extends ChannelI
 			pipeline.addLast("LoggingHandler", new LoggingHandler());
 		}
 		if(tcp) {
-			pipeline.addLast("Encoder", new TcpEncoder());
-			pipeline.addLast("Decoder", new TcpDecoder());
+			pipeline.addLast("Encodec", new TcpEncodec());
+			pipeline.addLast("Decodec", new TcpDecodec());
 		} else {
-			pipeline.addLast("Encoder", new UdpEncoder());
-			pipeline.addLast("Decoder", new UdpDecoder());
+			pipeline.addLast("Encodec", new UdpEncodec());
+			pipeline.addLast("Decodec", new UdpDecodec());
 		}
 		pipeline.addLast("DefaultHandler", new DefaultHandler());
 	}
@@ -74,7 +75,7 @@ public class DefaultClientChannelInitializer<C extends Channel> extends ChannelI
 	}
 
 	@Sharable
-	class TcpEncoder extends MessageToByteEncoder<Object> {
+	class TcpEncodec extends MessageToByteEncoder<Object> {
 
 		@Override
 		protected void encode(ChannelHandlerContext ctx, Object bctx, ByteBuf buf) throws Exception {
@@ -85,15 +86,16 @@ public class DefaultClientChannelInitializer<C extends Channel> extends ChannelI
 		
 	}
 	
-	class TcpDecoder extends ByteToMessageDecoder {
+	class TcpDecodec extends ByteToMessageDecoder {
 		
 		@Override
 		protected void decode(ChannelHandlerContext ctx, ByteBuf buf, List<Object> out) throws Exception {
 			
-			Object data = protocolCodec.decode(ctx, buf);
+			BettyProtocolCodecOrigin data = protocolCodec.decode(ctx, buf);
 			
 			if(data != null) {
-				BettyClientContext bctx = (BettyClientContext) protocolCodec.unscramble(data);
+				BettyClientContext bctx = new DefaultClientContext(data.seq, data.uid,
+						data.data, data.retCode, data.retMessage);
 				
 				bctx.setRemote(ctx.channel().remoteAddress());
 				bctx.setLocal(ctx.channel().localAddress());
@@ -105,7 +107,7 @@ public class DefaultClientChannelInitializer<C extends Channel> extends ChannelI
 	}
 	
 	@Sharable
-	class UdpEncoder extends ChannelOutboundHandlerAdapter {
+	class UdpEncodec extends ChannelOutboundHandlerAdapter {
 
 		@Override
 		public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
@@ -125,17 +127,18 @@ public class DefaultClientChannelInitializer<C extends Channel> extends ChannelI
 	}
 	
 	@Sharable
-	class UdpDecoder extends SimpleChannelInboundHandler<DatagramPacket> {
+	class UdpDecodec extends SimpleChannelInboundHandler<DatagramPacket> {
 
 		@Override
 		protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket msg) throws Exception {
 			
 			ByteBuf buf = msg.content();
 			
-			Object data = protocolCodec.decode(ctx, buf);
+			BettyProtocolCodecOrigin data = protocolCodec.decode(ctx, buf);
 			
 			if(data != null) {
-				BettyClientContext bctx = (BettyClientContext) protocolCodec.unscramble(data);
+				BettyClientContext bctx = new DefaultClientContext(data.seq, data.uid,
+						data.data, data.retCode, data.retMessage);
 				
 				bctx.setRemote(msg.sender());
 				

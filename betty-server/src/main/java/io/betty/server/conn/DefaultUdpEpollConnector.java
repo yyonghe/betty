@@ -55,7 +55,7 @@ public class DefaultUdpEpollConnector extends DefaultConnector implements BettyC
 		} catch (Exception e) {
 			new RuntimeException("StandardTcpConnector initInternal", e);
 		}
-		bootstrap.handler(new DefaultServerChannelInitializer<EpollDatagramChannel>(this, getProtocolCoder()));
+		bootstrap.handler(new DefaultServerChannelInitializer<EpollDatagramChannel>(this, getProtocolCodec()));
 		//
 		this.bootstrap = bootstrap;
 		this.workerGroup = workerGroup;

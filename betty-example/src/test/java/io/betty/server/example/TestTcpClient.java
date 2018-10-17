@@ -5,8 +5,8 @@ import java.util.Random;
 import io.betty.BettyClient;
 import io.betty.BettyClientContext;
 import io.betty.client.DefaultClient;
-import io.betty.coders.StringProtocolCoder;
-import io.betty.coders.StringProtocolPacket;
+import io.betty.codecs.StringProtocolCodec;
+import io.betty.codecs.StringProtocolPacket;
 import io.betty.server.exec.BettyThreadPoolResultWaitStrategy;
 import junit.framework.TestCase;
 
@@ -16,8 +16,8 @@ public class TestTcpClient extends TestCase {
 
 	public void testRun() throws Exception {
 		
-		BettyClient client = new DefaultClient(new String[]{"127.0.0.1"}, 
-				new int[] {8080}, new BettyThreadPoolResultWaitStrategy(), new StringProtocolCoder());
+		BettyClient client = new DefaultClient(new String[]{"192.168.215.129"}, 
+				new int[] {8080}, new BettyThreadPoolResultWaitStrategy(), new StringProtocolCodec());
 		
 		
 		StringProtocolPacket req = new StringProtocolPacket(new Random().nextInt(2100000000),
@@ -28,7 +28,7 @@ public class TestTcpClient extends TestCase {
 		try {
 			StringProtocolPacket rsp = client.waitFor(reqctx);
 			
-			System.out.println("rrrrrr: " + reqctx.getProtocolCoder().toString(rsp));
+			System.out.println("rrrrrr: " + reqctx.getProtocolCodec().toString(rsp));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

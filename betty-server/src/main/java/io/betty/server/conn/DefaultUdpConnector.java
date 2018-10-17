@@ -51,7 +51,7 @@ public class DefaultUdpConnector extends DefaultConnector implements BettyConnec
 		} catch (Exception e) {
 			new RuntimeException("StandardTcpConnector initInternal", e);
 		}
-		bootstrap.handler(new DefaultServerChannelInitializer<DatagramChannel>(this, getProtocolCoder()));
+		bootstrap.handler(new DefaultServerChannelInitializer<DatagramChannel>(this, getProtocolCodec()));
 		//
 		this.bootstrap = bootstrap;
 		this.workerGroup = workerGroup;

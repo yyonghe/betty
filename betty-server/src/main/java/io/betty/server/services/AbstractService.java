@@ -102,11 +102,11 @@ public abstract class AbstractService extends LifecycleBase implements BettyServ
 	}
 	
 	protected String formatflowRequest(BettyServerContext bctx) {
-		return bctx.getProtocolCoder().toString(bctx.getRequest());
+		return bctx.getProtocolCodec().toString(bctx.getRequest());
 	}
 	
 	protected String formatflowResponse(BettyServerContext bctx) {
-		return bctx.getProtocolCoder().toString(bctx.getResponse());
+		return bctx.getProtocolCodec().toString(bctx.getResponse());
 	}
 
 	@Override

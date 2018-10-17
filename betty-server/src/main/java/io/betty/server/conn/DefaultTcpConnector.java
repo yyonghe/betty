@@ -46,7 +46,7 @@ public class DefaultTcpConnector extends DefaultConnector implements BettyConnec
 		if(InternalSlf4JLoggerFactory.isEnableDump()) {
 			bootstrap.handler(new LoggingHandler());
 		}
-		bootstrap.childHandler(new DefaultServerChannelInitializer<SocketChannel>(this, this.getProtocolCoder()));
+		bootstrap.childHandler(new DefaultServerChannelInitializer<SocketChannel>(this, this.getProtocolCodec()));
 		//
 		this.bootstrap = bootstrap;
 		this.bossGroup = bossGroup;

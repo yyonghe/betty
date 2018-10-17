@@ -1,6 +1,6 @@
 package io.betty.server;
 
-import io.betty.BettyProtocolCoder;
+import io.betty.BettyProtocolCodec;
 import io.betty.lifecycle.Lifecycle;
 
 public interface BettyConnector extends Lifecycle {
@@ -21,9 +21,9 @@ public interface BettyConnector extends Lifecycle {
 	
 	public String getProtocol();
 	
-	public void setProtocolCoder(BettyProtocolCoder protocolCoder);
+	public void setProtocolCodec(BettyProtocolCodec protocolcodec);
 	
-	public BettyProtocolCoder getProtocolCoder();
+	public BettyProtocolCodec getProtocolCodec();
 	
 	public void setServer(BettyServer server);
 	

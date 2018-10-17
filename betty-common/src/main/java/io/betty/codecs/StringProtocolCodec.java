@@ -1,20 +1,18 @@
-package io.betty.coders;
+package io.betty.codecs;
 
 import java.nio.ByteBuffer;
-import java.util.Random;
 
 import org.slf4j.Logger;
 
-import io.betty.BettyContext;
-import io.betty.BettyProtocolCoder;
-import io.betty.client.DefaultClientContext;
+import io.betty.BettyProtocolCodecOrigin;
+import io.betty.BettyProtocolCodec;
 import io.betty.util.InternalSlf4JLoggerFactory;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 
-public class StringProtocolCoder implements BettyProtocolCoder {
+public class StringProtocolCodec implements BettyProtocolCodec {
 	
-	private static final Logger logger = InternalSlf4JLoggerFactory.getLogger(StringProtocolCoder.class);
+	private static final Logger logger = InternalSlf4JLoggerFactory.getLogger(StringProtocolCodec.class);
 
 	@Override
 	public byte[] encode(ChannelHandlerContext ctx, Object data) throws Exception {
@@ -34,7 +32,7 @@ public class StringProtocolCoder implements BettyProtocolCoder {
 	}
 
 	@Override
-	public Object decode(ChannelHandlerContext ctx, ByteBuf buf) throws Exception {
+	public BettyProtocolCodecOrigin decode(ChannelHandlerContext ctx, ByteBuf buf) throws Exception {
 		
 		buf.markReaderIndex();
 		
@@ -63,14 +61,7 @@ public class StringProtocolCoder implements BettyProtocolCoder {
 			logger.debug("Decode msg: {}, {}, {}, {}, {}", seq, uid, version, byteslen, data);
 		}
 		
-		return new StringProtocolPacket(seq, uid, version, data);
-	}
-
-	@Override
-	public BettyContext unscramble(Object data) {
-		StringProtocolPacket packet = (StringProtocolPacket) data;
-		DefaultClientContext bctx = new DefaultClientContext(packet.seq, new Random().nextInt(2100000000), data);
-		return bctx;
+		return new BettyProtocolCodecOrigin(seq, uid, "0", "231", new StringProtocolPacket(seq, uid, version, data));
 	}
 
 	@Override

@@ -6,7 +6,8 @@ import java.util.List;
 import org.slf4j.Logger;
 
 import io.betty.BettyExecutor;
-import io.betty.BettyProtocolCoder;
+import io.betty.BettyProtocolCodecOrigin;
+import io.betty.BettyProtocolCodec;
 import io.betty.lifecycle.LifecycleState;
 import io.betty.util.InternalSlf4JLoggerFactory;
 import io.netty.buffer.ByteBuf;
@@ -29,15 +30,15 @@ public class DefaultServerChannelInitializer<C extends Channel> extends ChannelI
 	private static final Logger logger = InternalSlf4JLoggerFactory.getLogger(DefaultServerChannelInitializer.class);
 	
 	private BettyConnector connector;
-	private BettyProtocolCoder protocolCodec;
+	private BettyProtocolCodec protocolCodec;
 	private boolean tcp;
 
-	public DefaultServerChannelInitializer(BettyConnector connector, BettyProtocolCoder protocolCoder) {
+	public DefaultServerChannelInitializer(BettyConnector connector, BettyProtocolCodec protocolcodec) {
 		
 		this.tcp = (connector.getKind() == BettyConnector.Kind.TCP);
 		//
 		this.connector = connector;
-		this.protocolCodec = protocolCoder;
+		this.protocolCodec = protocolcodec;
 	}
 	
 
@@ -48,11 +49,11 @@ public class DefaultServerChannelInitializer<C extends Channel> extends ChannelI
 			pipeline.addLast("LoggingHandler", new LoggingHandler());
 		}
 		if(tcp) {
-			pipeline.addLast("Encoder", new TcpEncoder());
-			pipeline.addLast("Decoder", new TcpDecoder());
+			pipeline.addLast("Encodec", new TcpEncodec());
+			pipeline.addLast("Decodec", new TcpDecodec());
 		} else {
-			pipeline.addLast("Encoder", new UdpEncoder());
-			pipeline.addLast("Decoder", new UdpDecoder());
+			pipeline.addLast("Encodec", new UdpEncodec());
+			pipeline.addLast("Decodec", new UdpDecodec());
 		}
 		pipeline.addLast("DefaultHandler", new DefaultHandler());
 	}
@@ -80,7 +81,7 @@ public class DefaultServerChannelInitializer<C extends Channel> extends ChannelI
 	}
 
 	@Sharable
-	class TcpEncoder extends MessageToByteEncoder<Object> {
+	class TcpEncodec extends MessageToByteEncoder<Object> {
 
 		@Override
 		protected void encode(ChannelHandlerContext ctx, Object msg, ByteBuf buf) throws Exception {
@@ -91,23 +92,23 @@ public class DefaultServerChannelInitializer<C extends Channel> extends ChannelI
 		
 	}
 	
-	class TcpDecoder extends ByteToMessageDecoder {
+	class TcpDecodec extends ByteToMessageDecoder {
 		
 		@Override
 		protected void decode(ChannelHandlerContext ctx, ByteBuf buf, List<Object> out) throws Exception {
 			
 			
-			Object data = protocolCodec.decode(ctx, buf);
+			BettyProtocolCodecOrigin origin = protocolCodec.decode(ctx, buf);
 			
-			if(data != null) {
+			if(origin != null) {
 				
-				BettyServerContext bctx = (BettyServerContext) protocolCodec.unscramble(data);
+				BettyServerContext bctx = new DefaultServerContext(origin.uid, origin.cmd, origin.subcmd, origin.data);
 				
 				bctx.setService(connector.getServer().findService(bctx.getSubcmd()));
 				
 				bctx.setRemote((InetSocketAddress) ctx.channel().remoteAddress());
 				bctx.setLocal((InetSocketAddress) ctx.channel().localAddress());
-				bctx.setProtocolCoder(protocolCodec);
+				bctx.setProtocolCodec(protocolCodec);
 				
 				out.add(bctx);
 			}
@@ -116,7 +117,7 @@ public class DefaultServerChannelInitializer<C extends Channel> extends ChannelI
 	}
 	
 	@Sharable
-	class UdpEncoder extends ChannelOutboundHandlerAdapter {
+	class UdpEncodec extends ChannelOutboundHandlerAdapter {
 
 		@Override
 		public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
@@ -136,17 +137,17 @@ public class DefaultServerChannelInitializer<C extends Channel> extends ChannelI
 	}
 	
 	@Sharable
-	class UdpDecoder extends SimpleChannelInboundHandler<DatagramPacket> {
+	class UdpDecodec extends SimpleChannelInboundHandler<DatagramPacket> {
 
 		@Override
 		protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket msg) throws Exception {
 			
 			ByteBuf buf = msg.content();
 			
-			Object data = protocolCodec.decode(ctx, buf);
+			BettyProtocolCodecOrigin origin = protocolCodec.decode(ctx, buf);
 			
-			if(data != null) {
-				BettyServerContext bctx = (BettyServerContext) protocolCodec.unscramble(data);
+			if(origin != null) {
+				BettyServerContext bctx = new DefaultServerContext(origin.uid, origin.cmd, origin.subcmd, origin.data);
 				
 				bctx.setService(connector.getServer().findService(bctx.getSubcmd()));
 				
@@ -154,7 +155,7 @@ public class DefaultServerChannelInitializer<C extends Channel> extends ChannelI
 				
 				bctx.setLocal(msg.recipient());
 				
-				bctx.setProtocolCoder(protocolCodec);
+				bctx.setProtocolCodec(protocolCodec);
 				
 				ctx.fireChannelRead(bctx);
 			}
